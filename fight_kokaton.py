@@ -1,7 +1,6 @@
 import random
 import sys
 import time
-
 import pygame as pg
 
 
@@ -9,6 +8,18 @@ WIDTH = 1600  # ゲームウィンドウの幅
 HEIGHT = 900  # ゲームウィンドウの高さ
 NUM_OF_BOMBS = 5  # 爆弾の数
 
+class Score:
+    def __init__(self):
+        self.font = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
+        self.color = (0, 0, 255)
+        self.value = 0
+        self.img = self.font.render("Score: 0", 0, self.color)
+        self.img_rect = self.img.get_rect()
+        self.img_rect.topleft = (100, HEIGHT - 50)
+
+    def update(self, screen):
+        self.img = self.font.render(f"Score: {self.value}", 0, self.color)
+        screen.blit(self.img, self.img_rect)
 
 def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
     """
@@ -160,6 +171,7 @@ def main():
     bird = Bird(3, (900, 400))
     bombs = [Bomb()for _ in range(NUM_OF_BOMBS)]
     beam = None
+    score = Score()  # Scoreインスタンスを生成
 
     clock = pg.time.Clock()
     tmr = 0
@@ -188,6 +200,7 @@ def main():
                     beam = None
                     bombs[i] = None
                     bird.change_img(6, screen)
+                    score.value += 1  # 爆弾を撃墜したらスコアを増加
                     pg.display.update()
 
         bombs = [bomb for bomb in bombs if bomb is not None]
@@ -198,10 +211,10 @@ def main():
             bomb.update(screen)
         if beam is not None:
             beam.update(screen)
+        score.update(screen)  # スコアを描画    
         pg.display.update()
         tmr += 1
         clock.tick(50)
-
 
 if __name__ == "__main__":
     pg.init()
