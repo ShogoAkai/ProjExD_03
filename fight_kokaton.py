@@ -10,6 +10,39 @@ HEIGHT = 900  # ゲームウィンドウの高さ
 NUM_OF_BOMBS = 5  # 爆弾の数
 
 
+class Score:
+    def __init__(self):
+        self.font = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
+        self.color = (0, 0, 255)
+        self.value = 0
+        self.img = self.font.render("Score: 0", 0, self.color)
+        self.img_rect = self.img.get_rect()
+        self.img_rect.topleft = (100, HEIGHT - 50)
+
+    def update(self, screen):
+        self.img = self.font.render(f"Score: {self.value}", 0, self.color)
+        screen.blit(self.img, self.img_rect)
+
+class Explosion:
+    def __init__(self, center):
+        self.images = [pg.image.load("ex03/fig/explosion.gif")]
+        self.images.extend([pg.transform.flip(image, True, False) for image in self.images])
+        self.index = 0
+        self.image = self.images[self.index]
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.life = 15  # 爆発時間
+
+    def update(self, screen):
+        self.life -= 1
+        if self.life <= 0:
+            return True  # 爆発が終了
+        elif self.index < len(self.images) - 1:
+            self.index += 1
+            self.image = self.images[self.index]
+        screen.blit(self.image, self.rect)
+        return False
+
 def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
     """
     オブジェクトが画面内or画面外を判定し，真理値タプルを返す関数
@@ -160,9 +193,11 @@ def main():
     bird = Bird(3, (900, 400))
     bombs = [Bomb()for _ in range(NUM_OF_BOMBS)]
     beam = None
+    score = Score()  # Scoreインスタンスを生成
 
     clock = pg.time.Clock()
     tmr = 0
+    explosions = []  # 爆発エフェクト用のリスト
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -186,8 +221,10 @@ def main():
                 if beam.rct.colliderect(bomb.rct):  # ビームと爆弾の衝突判定
                     # 撃墜＝Noneにする
                     beam = None
+                    explosions.append(Explosion(bomb.rct.center))
                     bombs[i] = None
                     bird.change_img(6, screen)
+                    score.value += 1  # 爆弾を撃墜したらスコアを増加
                     pg.display.update()
 
         bombs = [bomb for bomb in bombs if bomb is not None]
@@ -198,6 +235,9 @@ def main():
             bomb.update(screen)
         if beam is not None:
             beam.update(screen)
+
+        explosions = [explosion for explosion in explosions if not explosion.update(screen)]
+        score.update(screen)    
         pg.display.update()
         tmr += 1
         clock.tick(50)
