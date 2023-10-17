@@ -1,9 +1,7 @@
 import random
 import sys
 import time
-
 import pygame as pg
-
 
 WIDTH = 1600  # ゲームウィンドウの幅
 HEIGHT = 900  # ゲームウィンドウの高さ
@@ -121,7 +119,6 @@ class Bomb:
     colors = [(255, 0, 0), (255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (255, 0, 255)]
     directions = [-5, +5]
   
-
     def __init__(self):
         """
         引数に基づき爆弾円Surfaceを生成する
@@ -130,7 +127,6 @@ class Bomb:
         """
         rad = random.randint(10, 50)  # 半径をランダムに設定
         color = random.choice(__class__.colors)
-    
         self.img = pg.Surface((2*rad, 2*rad))
         pg.draw.circle(self.img, color, (rad, rad), rad)
         self.img.set_colorkey((0, 0, 0))
@@ -152,7 +148,6 @@ class Bomb:
         self.rct.move_ip(self.vx, self.vy)
         screen.blit(self.img, self.rct)
 
-
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))    
@@ -171,7 +166,6 @@ def main():
                 # キーが押されたら，かつ，キーの種類がスペースキーだったら
                 beam = Beam(bird)
 
-        
         screen.blit(bg_img, [0, 0])
         
         for bomb in bombs:
@@ -201,7 +195,6 @@ def main():
         pg.display.update()
         tmr += 1
         clock.tick(50)
-
 
 if __name__ == "__main__":
     pg.init()
